@@ -1,7 +1,8 @@
-import React, { Component } from "react";
-import StoreFront from "./Components/StoreFront/StoreFront";
-import ShoppingCart from "./Components/ShoppingCart/ShoppingCart";
-import NavBar from "./Components/NavBar/NavBar";
+import React, { Component } from 'react';
+import StoreFront from './Components/StoreFront/StoreFront';
+import ShoppingCart from './Components/ShoppingCart/ShoppingCart';
+import NavBar from './Components/NavBar/NavBar';
+import axios from 'axios';
 
 class App extends Component {
   constructor(props) {
@@ -12,12 +13,12 @@ class App extends Component {
       showCart: false
     };
     this.addToCart = this.addToCart.bind(this);
-    this.removeFromCart = this.removeFromCart.bind(this);
+    this.removeFromShoppingCart = this.removeFromShoppingCart.bind(this);
     this.navigate = this.navigate.bind(this);
   }
   componentDidMount() {
     axios
-      .get("https://practiceapi.devmountain.com/products/")
+      .get('https://practiceapi.devmountain.com/products/')
       .then(response => {
         this.setState({
           products: response.data
@@ -29,15 +30,16 @@ class App extends Component {
       cart: [...this.state.cart, item]
     });
   }
-  removeFromCart(index) {
-    let cartCopy = this.state.cart.slice();
-    cartCopy.splice(index, 1);
+  removeFromShoppingCart(product) {
+    let newShoppingCart = this.state.shoppingCart;
+    newShoppingCart.splice(newShoppingCart.indexOf(product), 1);
     this.setState({
-      cart: cartCopy
+      shoppingCart: newShoppingCart
     });
+    console.log(this.state.shoppingCart);
   }
   navigate(location) {
-    if (location === "cart") {
+    if (location === 'cart') {
       this.setState({
         showCart: true
       });
@@ -54,9 +56,12 @@ class App extends Component {
         <NavBar navigate={this.navigate} />
         <div className="main-container">
           {showCart ? (
-            <ShoppingCart cart={cart} />
+            <ShoppingCart
+              cart={this.state.shoppingCart}
+              removeFromShoppingCart={this.removeFromShoppingCart}
+            />
           ) : (
-            <StoreFront products={products} />
+            <StoreFront products={products} addToCart={this.addToCart} />
           )}
         </div>
       </div>
